@@ -1,19 +1,7 @@
-# Flask API Framework
+# Backend simples
 Flask>=2.3.0
 Flask-CORS>=4.0.0
-
-# Database
 PyMySQL>=1.0.0
-
-# Machine Learning
-scikit-learn>=1.3.0
 pandas>=2.0.0
-numpy>=1.24.0
-
-# Data Visualization (for future use)
+scikit-learn>=1.3.0
 matplotlib>=3.7.0
-seaborn>=0.12.0
-
-# Utilities
-python-dotenv>=1.0.0
-requests>=2.31.0

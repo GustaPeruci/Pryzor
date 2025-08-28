@@ -1,14 +1,12 @@
-"""
-Gerenciador do banco de dados MySQL para o projeto Pryzor
-Migrado de SQLite para MySQL mantendo a mesma interface
-"""
+# Conexão com MySQL para o Pryzor
+# Tentei usar pymysql primeiro pq é mais fácil
 
 try:
     import pymysql
     pymysql.install_as_MySQLdb()
     MYSQL_CONNECTOR = 'pymysql'
     Error = pymysql.Error
-    print("✅ Usando PyMySQL como conector")
+    print("✅ Usando PyMySQL")
 except ImportError:
     try:
         import mysql.connector
@@ -16,7 +14,7 @@ except ImportError:
         MYSQL_CONNECTOR = 'mysql.connector'
         print("✅ Usando MySQL Connector")
     except ImportError:
-        raise ImportError("Instale mysql-connector-python ou pymysql")
+        raise ImportError("Precisa instalar mysql-connector-python ou pymysql")
 
 import pandas as pd
 from pathlib import Path

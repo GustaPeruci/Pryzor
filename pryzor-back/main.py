@@ -1,70 +1,48 @@
-"""
-Script principal para executar a Fase 1.1
-Orquestra migração de dados e análise básica
-"""
+# Script principal do Pryzor
+# Roda análises básicas dos jogos
 
 import sys
 import os
-from pathlib import Path
-
-# Adiciona o diretório src ao path
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 
-from database_manager import DatabaseManager
-from data_migrator import DataMigrator
-from basic_analyzer import BasicAnalyzer
+from src.database_manager import DatabaseManager
+from src.basic_analyzer import BasicAnalyzer
+from src.advanced_analyzer import AdvancedAnalyzer
 
 def main():
-    """Executa o pipeline completo da Fase 1.1"""
-    print("🚀 PRYZOR - FASE 1.1: ESTRUTURA BÁSICA")
-    print("=" * 60)
-    print("📋 Pipeline: Banco → Migração → Análise")
-    print("=" * 60)
+    print("=== PRYZOR - Análise de Preços Steam ===\n")
     
     try:
-        # Passo 1: Inicializar banco de dados
-        print("\n🔧 PASSO 1: Inicializando banco de dados...")
+        # Conectar ao banco
+        print("Conectando ao MySQL...")
         db = DatabaseManager()
-        print("✅ Banco de dados pronto!")
         
-        # Passo 2: Migrar dados existentes
-        print("\n📦 PASSO 2: Migrando dados existentes...")
-        migrator = DataMigrator()
-        migrator.run_migration()
-        print("✅ Migração concluída!")
-        
-        # Passo 3: Executar análise básica
-        print("\n📊 PASSO 3: Executando análise básica...")
+        # Análises básicas
+        print("\n1. Analisando jogos...")
         analyzer = BasicAnalyzer()
-        analyzer.run_basic_analysis()
-        print("✅ Análise concluída!")
+        stats = analyzer.get_basic_stats()
+        print(f"Total de jogos: {len(stats)}")
         
-        # Resumo final
-        print("\n🎉 FASE 1.1 CONCLUÍDA COM SUCESSO!")
-        print("=" * 60)
-        print("📁 Estrutura criada:")
-        print("  ├── 📂 database/pryzor.db (Banco SQLite)")
-        print("  ├── 📂 data/analysis_output/ (Resultados)")
-        print("  └── 📂 src/ (Código fonte)")
-        print("\n🎯 Próximos passos:")
-        print("  → Executar análises específicas")
-        print("  → Adicionar novos dados do SteamDB")
-        print("  → Implementar Fase 1.2 (análise avançada)")
+        # Melhores ofertas
+        print("\n2. Buscando melhores ofertas...")
+        deals = analyzer.find_best_deals(limit=3)
+        for deal in deals:
+            print(f"- {deal['game_name']}: R${deal['current_price']:.2f} (desconto de {deal['discount_percentage']:.1f}%)")
         
-        # Estatísticas finais
-        stats = db.get_database_stats()
-        print(f"\n📊 Banco atual: {stats['total_games']} jogos, {stats['total_price_records']} registros")
+        # Predições ML
+        print("\n3. Fazendo predições (7 dias)...")
+        advanced = AdvancedAnalyzer()
+        predictions = advanced.predict_future_prices(days=7)
+        
+        if not predictions.empty:
+            for _, row in predictions.head(3).iterrows():
+                trend = ((row['predicted_price'] - row['current_price']) / row['current_price']) * 100
+                print(f"- {row['game']}: {trend:+.1f}% (R${row['current_price']:.2f} → R${row['predicted_price']:.2f})")
+        
+        print("\n✅ Análise concluída!")
         
     except Exception as e:
-        print(f"\n❌ ERRO na execução: {e}")
-        print("🔧 Verifique os logs e tente novamente")
-        return False
-    
-    return True
+        print(f"❌ Erro: {e}")
 
 if __name__ == "__main__":
-    success = main()
-    if success:
-        print("\n🚀 Execute 'python -m src.basic_analyzer' para análises adicionais!")
-    else:
-        sys.exit(1)
+    main()
