@@ -1,0 +1,22 @@
+{
+  "price_drop_threshold": 15,
+  "price_below_avg_threshold": 20,
+  "monitored_games": [
+    {
+      "name": "Cyberpunk 2077",
+      "target_price": null,
+      "added_date": "2025-08-27T16:08:14.408201"
+    },
+    {
+      "name": "Elden Ring",
+      "target_price": null,
+      "added_date": "2025-08-27T16:08:14.410366"
+    },
+    {
+      "name": "The Witcher 3",
+      "target_price": null,
+      "added_date": "2025-08-27T16:08:14.411371"
+    }
+  ],
+  "last_check": "2025-08-28T09:57:50.454345"
+}
