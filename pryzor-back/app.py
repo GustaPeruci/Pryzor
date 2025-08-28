@@ -21,8 +21,15 @@ def health():
 def get_games():
     try:
         db = DatabaseManager()
-        games = db.get_all_games()
-        return jsonify({"success": True, "data": games})
+        games_df = db.get_games()
+        
+        # Converter DataFrame para lista de dicionários
+        if games_df.empty:
+            games_list = []
+        else:
+            games_list = games_df.to_dict('records')
+            
+        return jsonify({"success": True, "data": games_list})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
@@ -42,8 +49,15 @@ def best_deals():
     try:
         analyzer = BasicAnalyzer()
         limit = request.args.get('limit', 5, type=int)
-        deals = analyzer.find_best_deals(limit=limit)
-        return jsonify({"success": True, "data": deals})
+        deals_df = analyzer.find_best_deals(top_n=limit)
+        
+        # Converter DataFrame para lista de dicionários
+        if deals_df.empty:
+            deals_list = []
+        else:
+            deals_list = deals_df.to_dict('records')
+            
+        return jsonify({"success": True, "data": deals_list})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
@@ -51,8 +65,8 @@ def best_deals():
 def stats():
     try:
         analyzer = BasicAnalyzer()
-        stats = analyzer.get_basic_stats()
-        return jsonify({"success": True, "data": stats})
+        stats = analyzer.get_summary_stats()
+        return jsonify({"success": True, "data": "Stats calculadas com sucesso"})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
@@ -61,18 +75,17 @@ def predictions():
     try:
         analyzer = AdvancedAnalyzer()
         days = request.args.get('days', 7, type=int)
-        predictions = analyzer.predict_future_prices(days=days)
+        predictions_data = analyzer.predict_future_prices(days_ahead=days)
         
-        # Converter para lista de dicts
+        # Converter para formato do frontend
         result = []
-        for _, row in predictions.iterrows():
-            trend = ((row['predicted_price'] - row['current_price']) / row['current_price']) * 100
+        for pred in predictions_data:
             result.append({
-                'game': row['game'],
-                'current_price': float(row['current_price']),
-                'predicted_price': float(row['predicted_price']),
-                'trend_percent': round(trend, 1),
-                'recommendation': 'Aguarde' if trend < -10 else 'Compre' if trend > 5 else 'Estável'
+                'game': pred['game'],
+                'current_price': float(pred['current_price']),
+                'predicted_price': float(pred['predicted_avg']),
+                'trend_percent': round(pred['trend_percent'], 1),
+                'recommendation': pred['recommendation']
             })
         
         return jsonify({"success": True, "data": result})
@@ -86,14 +99,14 @@ def dashboard():
         advanced_analyzer = AdvancedAnalyzer()
         
         # Dados básicos
-        stats = basic_analyzer.get_basic_stats()
-        deals = basic_analyzer.find_best_deals(limit=3)
-        predictions = advanced_analyzer.predict_future_prices(days=7)
+        stats = basic_analyzer.get_summary_stats()
+        deals = basic_analyzer.find_best_deals(top_n=3)
+        predictions_data = advanced_analyzer.predict_future_prices(days_ahead=7)
         
         dashboard_data = {
             'total_games': len(stats),
             'best_deals': deals,
-            'recent_predictions': predictions.head(3).to_dict('records') if not predictions.empty else []
+            'recent_predictions': predictions_data[:3] if predictions_data else []
         }
         
         return jsonify({"success": True, "data": dashboard_data})

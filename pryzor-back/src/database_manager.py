@@ -25,7 +25,9 @@ import os
 
 # Importa configuração do MySQL
 try:
-    from mysql_config import get_mysql_config, get_connection_string
+    from src.mysql_config import MYSQL_CONFIG
+    def get_mysql_config(env='local'):
+        return MYSQL_CONFIG
 except ImportError:
     # Configuração padrão se o arquivo não existir
     def get_mysql_config(env='local'):
@@ -33,7 +35,7 @@ except ImportError:
             'host': 'localhost',
             'port': 3306,
             'user': 'root',
-            'password': '',
+            'password': 'root',
             'database': 'pryzor_db'
         }
 
