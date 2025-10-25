@@ -33,3 +33,5 @@ ENV/
 tcc_docs/
 pryzor-back/
 pryzor-front/
+PriceHistory/
+n2_ad/
