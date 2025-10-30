@@ -67,6 +67,29 @@ Simples, direto e útil.
 
 Prevê se um jogo vai ter desconto **maior que 20%** nos próximos 30 dias.
 
+### Resultados do Treinamento (Out/2025)
+
+**Dataset:** 725.268 registros (Steam 2019-2020)
+**Split temporal:** Treino até 2020-04-01, Teste após
+
+**Métricas no Teste (194.017 registros):**
+- Accuracy: 77.93%
+- Precision: 90.26%
+- Recall: 60.55%
+- F1-Score: 72.48%
+- ROC-AUC: 81.83%
+
+**Matriz de Confusão (Teste):**
+|        | Prevê NÃO | Prevê SIM |
+|--------|-----------|-----------|
+| Real NÃO | 94.808    | 6.086     |
+| Real SIM | 36.736    | 56.387    |
+
+**Principais Features:**
+- discount_percent, month, quarter, final_price, is_summer_sale, is_winter_sale, day_of_week, is_weekend
+
+**Recomendação:** Modelo v2.0 é robusto, confiável e pronto para produção. Foco em ML validado para TCC.
+
 ### Como foi treinado?
 
 Usamos dados reais da Steam (2019-2020) com **validação temporal** - isso significa que o modelo aprendeu com dados do passado e foi testado com dados do futuro, sem "colar" no tempo (evitando data leakage).
@@ -83,10 +106,10 @@ O modelo analisa 8 coisas sobre o jogo:
 
 | Métrica | Valor | O que significa? |
 |---------|-------|------------------|
-| **Precision** | 90.46% | Quando ele diz "vai ter desconto", acerta 9 em 10 vezes |
-| **F1-Score** | 74.34% | Balanço geral entre acertos e cobertura |
-| **Recall** | 63.09% | Captura 63% dos descontos que realmente acontecem |
-| **ROC-AUC** | 79.45% | Capacidade de distinguir entre classes |
+| **Precision** | 90.46% | Proporção de previsões positivas que realmente são verdadeiras. Mede o quão confiável é o alerta de desconto: de cada 10 vezes que o modelo prevê desconto, 9 estão corretas. Alta precision significa poucos falsos alarmes. |
+| **F1-Score** | 74.34% | Média harmônica entre precision e recall. Resume o equilíbrio entre acertar e cobrir os casos positivos. Um F1 alto indica que o modelo é bom tanto em acertar quanto em não deixar passar oportunidades. |
+| **Recall** | 63.09% | Proporção dos descontos reais que o modelo conseguiu identificar. Mede a capacidade de encontrar oportunidades: de todos os descontos que realmente aconteceram, o modelo capturou 63%. |
+| **ROC-AUC** | 79.45% | Área sob a curva ROC. Mede a capacidade do modelo de distinguir entre jogos que terão ou não desconto, independentemente do limiar de decisão. Quanto mais próximo de 100%, melhor o poder de separação entre as classes. |
 
 **Validação em casos reais:** Testamos o modelo em **1.000 jogos reais** e obtivemos:
 - ✅ **92.4% de acurácia geral**
