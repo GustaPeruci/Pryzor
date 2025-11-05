@@ -1,0 +1,10 @@
+flowchart LR
+  FE["Frontend (React)"]
+  BE["Backend (FastAPI)"]
+  DB["Database (MySQL)"]
+  ML["Modelo ML (Random Forest)"]
+
+  FE -->|API HTTP| BE
+  BE -->|Consulta SQL| DB
+  BE -->|Predição ML| ML
+  ML -->|Resultado| BE
