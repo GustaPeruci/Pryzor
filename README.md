@@ -31,33 +31,180 @@ Simples, direto e útil.
 
 ---
 
-## 🏗️ Como Funciona (Arquitetura)
 
+## Arquitetura do Sistema
+
+O Pryzor segue arquitetura client-server, separando frontend (React + TypeScript) e backend (FastAPI + Python).
+
+### Componentes Principais
+- Frontend: Interface web para busca, análise e recomendação
+- Backend: API REST, serviço de predição ML, integração MySQL
+- Banco de dados: MySQL, persistência de jogos e histórico de preços
+- Serviço ML: Random Forest, pipeline de ETL e validação temporal
+
+### Diagrama C4 (nível de containers)
+
+```mermaid
+flowchart TD
+  Usuario --> Frontend
+  Frontend --> Backend
+  Backend --> MySQL
+  Backend --> ML
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                         PRYZOR                               │
-├─────────────────────────────────────────────────────────────┤
-│                                                              │
-│  ┌──────────────┐      ┌──────────────┐     ┌────────────┐ │
-│  │   Frontend   │ ───▶ │   Backend    │ ──▶ │   MySQL    │ │
-│  │  React + TS  │ ◀─── │    FastAPI   │ ◀── │  Database  │ │
-│  └──────────────┘      └──────┬───────┘     └────────────┘ │
-│                               │                              │
-│                               ▼                              │
-│                      ┌─────────────────┐                     │
-│                      │  Modelo ML v2.0 │                     │
-│                      │  Random Forest  │                     │
-│                      └─────────────────┘                     │
-│                                                              │
-└─────────────────────────────────────────────────────────────┘
-```
 
-### Componentes:
+---
 
-- **Frontend (React + TypeScript)**: Interface onde você busca jogos e vê as previsões
-- **Backend (FastAPI)**: API que gerencia dados e faz as previsões
-- **Banco de Dados (MySQL)**: Armazena 2.000 jogos e 725k registros de preços históricos
-- **Modelo ML (Random Forest)**: Cérebro do sistema, treinado com dados de 2019-2020
+## Requisitos Funcionais
+
+- Permitir busca e listagem de jogos da Steam
+- Exibir detalhes e histórico de preços de jogos
+- Realizar previsões de desconto utilizando modelo de Machine Learning
+- Fornecer recomendações de compra ou espera
+- Disponibilizar estatísticas gerais do sistema
+- Permitir predição em lote para múltiplos jogos
+- Oferecer endpoints administrativos para setup e importação de dados
+
+## Casos de Uso
+
+- Usuário consulta se um jogo terá desconto nos próximos 30 dias
+- Usuário busca jogos por nome e visualiza histórico de preços
+- Usuário recebe recomendação baseada em análise de dados e modelo ML
+- Administrador inicializa banco de dados e importa datasets
+
+---
+
+## Instruções de Deploy
+
+### Backend
+
+**Pré-requisitos:** Python 3.8+, MySQL 8.0+
+
+1. Clone o repositório e acesse `pryzor-back`
+2. Crie e ative ambiente virtual:
+  ```bash
+  python -m venv venv
+  venv\Scripts\activate  # Windows
+  source venv/bin/activate  # Mac/Linux
+  ```
+3. Instale dependências:
+  ```bash
+  pip install -r requirements.txt
+  ```
+4. Configure o banco de dados em `.env` (veja `.env.example`)
+5. Execute a API:
+  ```bash
+  python src/main.py
+  ```
+6. Acesse `http://localhost:8000/docs`
+
+### Frontend
+
+**Pré-requisitos:** Node.js 16+
+
+1. Acesse `pryzor-front`
+2. Instale dependências:
+  ```bash
+  npm install
+  ```
+3. Execute o servidor de desenvolvimento:
+  ```bash
+  npm start
+  ```
+4. Acesse `http://localhost:3000`
+
+### Deploy em Produção
+- Recomenda-se uso de Docker e integração com CI/CD (GitHub Actions)
+- Configurar variáveis de ambiente e banco de dados seguro
+- Documentar endpoints públicos e credenciais de acesso restrito
+
+---
+
+## Cobertura de Testes Automatizados
+
+### Backend
+- Testes com pytest cobrindo todos os principais endpoints, cenários de erro, predição individual e em lote, saúde do sistema e estatísticas.
+- Para executar:
+  ```bash
+  pytest tests/
+  pytest --cov=src tests/
+  ```
+- Relatório de cobertura pode ser gerado e anexado.
+
+### Frontend
+- Testes com Jest + React Testing Library cobrindo componentes principais, interações, callbacks, estados de loading/erro.
+- Para executar:
+  ```bash
+  npm test
+  ```
+- Relatório de cobertura pode ser gerado e anexado.
+
+---
+
+## Análise Estática de Código
+
+Recomenda-se o uso de SonarQube, SonarCloud ou CodeClimate para análise de qualidade e segurança do código.
+
+**Como executar:**
+- Configure SonarQube/SonarCloud no repositório
+- Execute análise e gere relatório
+- Inclua link ou print do relatório na documentação
+
+**Pontos avaliados:**
+- Qualidade do código
+- Segurança
+- Cobertura de testes
+- Duplicidade e complexidade
+
+---
+
+## Monitoramento e Observabilidade
+
+O sistema pode ser integrado a ferramentas como Prometheus, Grafana ou Zabbix para monitoramento de métricas e saúde da aplicação.
+
+**Recomendações:**
+- Configurar coleta de métricas do backend (FastAPI)
+- Criar dashboards para acompanhamento em produção
+- Documentar prints ou links dos dashboards
+
+**Exemplos:**
+- Monitoramento de uso de CPU, memória, requisições, erros
+- Alertas para falhas ou indisponibilidade
+
+---
+
+## Ética e Privacidade
+
+O projeto Pryzor respeita a privacidade dos dados e está em conformidade com a LGPD.
+
+**Princípios adotados:**
+- Não utiliza dados sensíveis ou pessoais
+- Todos os dados são públicos ou sintéticos
+- Não há práticas discriminatórias ou violação ética
+- Documentação e código seguem boas práticas de transparência
+
+**Observação:**
+- Caso o projeto evolua para produção, recomenda-se revisão contínua das políticas de privacidade e conformidade legal.
+
+---
+
+## Fluxos de Negócio
+
+- Consulta de jogos e histórico de preços
+- Previsão de desconto e recomendação
+- Setup e importação de dados
+
+---
+
+## Links Úteis
+
+- Repositório principal: [GitHub](https://github.com/GustaPeruci/Pryzor)
+- Frontend: [https://github.com/GustaPeruci/pryzor-front](https://github.com/GustaPeruci/pryzor-front)
+- Backend: [https://github.com/GustaPeruci/pryzor-back](https://github.com/GustaPeruci/pryzor-back)
+- Deploy de produção: [https://pryzor-front.onrender.com/](https://pryzor-front.onrender.com/)
+- Documentação interativa: http://localhost:8000/docs
+- Relatório de testes: (anexar relatório gerado)
+
+---
 
 ---
 
