@@ -364,14 +364,20 @@ Este projeto foi desenvolvido como Trabalho de Conclusão de Curso em Engenharia
 
 ✅ **Validação temporal adequada** - Corrigimos data leakage, uma armadilha comum em séries temporais  
 ✅ **Pipeline completo** - ETL, feature engineering, treinamento, validação, deploy  
-✅ **API RESTful funcional** - 11 endpoints testados e documentados  
-✅ **Código limpo** - Organizado, comentado, testado  
-✅ **Documentação completa** - README, docs técnicos, comentários  
+
+
+
+✅ **Testes automatizados completos**
+  - Backend: Cobertura de todos os principais endpoints, cenários de erro, predição em lote, health e stats (pytest)
+  - Frontend: Cobertura dos principais componentes (`GameCard`, `GameList`, `GameSearch`, `ModelMetrics`, `PriceAnalysisResult`, `Header`, `App`), incluindo renderização, interações, callbacks, estados de loading/erro (Jest + React Testing Library)
+  - Todos os testes passam e cobrem os fluxos essenciais para apresentação de portfólio/TCC
+
 
 ### O que o projeto demonstra:
 
 - 🧠 **Machine Learning aplicado** - Não é só teoria, funciona de verdade
 - 🔧 **Engenharia de Software** - Arquitetura limpa, código testável
+- 🧪 **Testes automatizados robustos** - Backend e frontend validados com pytest e Jest/RTL
 - 📊 **Análise de dados** - ETL, feature engineering, validação
 - 🌐 **Desenvolvimento Full-Stack** - Backend + Frontend integrados
 - 📚 **Rigor acadêmico** - Metodologia, documentação, reprodutibilidade
@@ -392,5 +398,24 @@ Este projeto é acadêmico e foi desenvolvido para fins de aprendizado.
 🎓 TCC - Engenharia de Software - 2025
 
 ---
+
+## 🧪 Testes Automatizados
+
+### Backend
+- Execute todos os testes com:
+  ```bash
+  pytest pryzor-back/tests/test_api.py
+  ```
+- Cobertura: endpoints, erros, batch, health, stats
+
+### Frontend
+- Execute todos os testes com:
+  ```bash
+  cd pryzor-front
+  npm test
+  ```
+- Cobertura: componentes principais, renderização, interações, callbacks, estados de loading/erro
+
+Todos os testes passam e cobrem os fluxos essenciais para apresentação de portfólio/TCC.
 
 **💡 Dica:** Para mais detalhes técnicos sobre o backend ou frontend, veja os READMEs específicos em `pryzor-back/README.md` e `pryzor-front/README.md`.
