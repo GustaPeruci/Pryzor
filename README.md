@@ -1,4 +1,4 @@
-# 🎯 Pryzor - Previsão de Descontos na Steam
+# Pryzor - Previsão de Descontos na Steam
 
 > **TCC - Engenharia de Software**  
 > Sistema inteligente que prevê quando jogos da Steam vão entrar em promoção
@@ -7,12 +7,12 @@ Sabe quando você fica na dúvida se compra um jogo agora ou espera uma promoç�
 
 ---
 
-## 🤔 O Problema
+## O Problema
 
 Todo gamer já passou por isso:
-- � Comprou um jogo e ele entrou em promoção na semana seguinte
-- � Ficou esperando um desconto que nunca chegou
-- 🤷 Não sabe se o preço atual é bom ou se vale esperar
+- Comprou um jogo e ele entrou em promoção na semana seguinte
+- Ficou esperando um desconto que nunca chegou
+- Não sabe se o preço atual é bom ou se vale esperar
 
 O Pryzor foi criado para acabar com essas dúvidas.
 
@@ -126,9 +126,7 @@ flowchart TD
 - Para executar:
   ```bash
   pytest tests/
-  pytest --cov=src tests/
   ```
-- Relatório de cobertura pode ser gerado e anexado.
 
 ### Frontend
 - Testes com Jest + React Testing Library cobrindo componentes principais, interações, callbacks, estados de loading/erro.
@@ -136,41 +134,10 @@ flowchart TD
   ```bash
   npm test
   ```
-- Relatório de cobertura pode ser gerado e anexado.
 
 ---
 
-## Análise Estática de Código
 
-Recomenda-se o uso de SonarQube, SonarCloud ou CodeClimate para análise de qualidade e segurança do código.
-
-**Como executar:**
-- Configure SonarQube/SonarCloud no repositório
-- Execute análise e gere relatório
-- Inclua link ou print do relatório na documentação
-
-**Pontos avaliados:**
-- Qualidade do código
-- Segurança
-- Cobertura de testes
-- Duplicidade e complexidade
-
----
-
-## Monitoramento e Observabilidade
-
-O sistema pode ser integrado a ferramentas como Prometheus, Grafana ou Zabbix para monitoramento de métricas e saúde da aplicação.
-
-**Recomendações:**
-- Configurar coleta de métricas do backend (FastAPI)
-- Criar dashboards para acompanhamento em produção
-- Documentar prints ou links dos dashboards
-
-**Exemplos:**
-- Monitoramento de uso de CPU, memória, requisições, erros
-- Alertas para falhas ou indisponibilidade
-
----
 
 ## Ética e Privacidade
 
@@ -202,7 +169,6 @@ O projeto Pryzor respeita a privacidade dos dados e está em conformidade com a 
 - Backend: [https://github.com/GustaPeruci/pryzor-back](https://github.com/GustaPeruci/pryzor-back)
 - Deploy de produção: [https://pryzor-front.onrender.com/](https://pryzor-front.onrender.com/)
 - Documentação interativa: http://localhost:8000/docs
-- Relatório de testes: (anexar relatório gerado)
 
 ---
 
@@ -244,10 +210,10 @@ Usamos dados reais da Steam (2019-2020) com **validação temporal** - isso sign
 ### Quais features ele usa?
 
 O modelo analisa 8 coisas sobre o jogo:
-- � Mês do ano e trimestre (sazonalidade)
-- � Preço atual e desconto atual
-- 🏖️ Se está em período de Summer Sale ou Winter Sale
-- � Dia da semana e se é final de semana
+- Mês do ano e trimestre (sazonalidade)
+- Preço atual e desconto atual
+- Se está em período de Summer Sale ou Winter Sale
+- Dia da semana e se é final de semana
 
 ### Quão bom ele é?
 
@@ -259,9 +225,9 @@ O modelo analisa 8 coisas sobre o jogo:
 | **ROC-AUC** | 79.45% | Área sob a curva ROC. Mede a capacidade do modelo de distinguir entre jogos que terão ou não desconto, independentemente do limiar de decisão. Quanto mais próximo de 100%, melhor o poder de separação entre as classes. |
 
 **Validação em casos reais:** Testamos o modelo em **1.000 jogos reais** e obtivemos:
-- ✅ **92.4% de acurácia geral**
-- ✅ **97.7% de acerto** quando prevê "não terá desconto"
-- ✅ **Zero casos** de "aguardar" quando o preço aumentou (Stardew Valley confirmado como caso isolado)
+- **92.4% de acurácia geral**
+- **97.7% de acerto** quando prevê "não terá desconto"
+- **Zero casos** de "aguardar" quando o preço aumentou (Stardew Valley confirmado como caso isolado)
 
 **Por que a Precision é tão alta?**  
 Porque priorizamos **confiabilidade**. É melhor ser conservador e correto do que prometer um desconto que não vai acontecer. Quando o Pryzor diz "espera aí que vai ter promoção", você pode confiar.
@@ -273,9 +239,9 @@ Porque priorizamos **confiabilidade**. É melhor ser conservador e correto do qu
 
 ## 🔬 Histórico de Evolução do Modelo
 
-### 📦 Modelo v2.0 (ATUAL - EM PRODUÇÃO)
+### Modelo v2.0 (ATUAL - EM PRODUÇÃO)
 **Data:** Outubro 2025  
-**Status:** ✅ Estável e validado
+**Status:** Estável e validado
 
 **Características:**
 - 8 features (temporais + contextuais)
@@ -299,9 +265,9 @@ Modelo conservador e confiável. Prefere não prever desconto quando há dúvida
 
 ---
 
-### ❌ Modelo v3.0 (DESCARTADO)
+### Modelo v3.0 (DESCARTADO)
 **Data:** Outubro 2025  
-**Status:** ⛔ Rejeitado - Performance inferior ao v2.0
+**Status:** Rejeitado - Performance inferior ao v2.0
 
 **O que tentamos:**
 - Target multi-classe (4 categorias: price_increase, stable, small_discount, large_discount)
@@ -309,10 +275,10 @@ Modelo conservador e confiável. Prefere não prever desconto quando há dúvida
 - Motivação: Resolver caso Stardew Valley
 
 **Resultado:**
-- ❌ F1-Score: ~45% (vs 74% do v2.0)
-- ❌ Precision caiu drasticamente
-- ❌ Complexidade adicional sem ganho prático
-- ❌ ROC-AUC: 74.2% (vs 79.45% do v2.0)
+- F1-Score: ~45% (vs 74% do v2.0)
+- Precision caiu drasticamente
+- Complexidade adicional sem ganho prático
+- ROC-AUC: 74.2% (vs 79.45% do v2.0)
 
 **Lição aprendida:**  
 Multi-classe não funciona bem com dados desbalanceados. O caso Stardew Valley (preço aumentou após promoção) é EXTREMAMENTE RARO (0.3% dos casos). Não vale adicionar complexidade para resolver 3 casos em 1000.
@@ -321,9 +287,9 @@ Multi-classe não funciona bem com dados desbalanceados. O caso Stardew Valley (
 
 ---
 
-### ❌ Modelo v2.1 (DESCARTADO)
+### Modelo v2.1 (DESCARTADO)
 **Data:** Outubro 2025  
-**Status:** ⛔ Rejeitado - Piora significativa
+**Status:** Rejeitado - Piora significativa
 
 **O que tentamos:**
 - Adicionar 3 features de duração de promoção:
@@ -334,10 +300,10 @@ Multi-classe não funciona bem com dados desbalanceados. O caso Stardew Valley (
 - Motivação: 53 de 76 erros eram em jogos com desconto ativo
 
 **Resultado:**
-- ❌ **F1-Score: 38.11%** (vs 74.34% do v2.0) - QUEDA DE 36%!
-- ❌ Precision: 25.67% (vs 90.46%) - DESTRUÍDA
-- ✅ Recall: 73.97% (vs 63.09%) - Aumentou, mas...
-- ❌ ROC-AUC: 73.71% (vs 79.45%)
+- **F1-Score: 38.11%** (vs 74.34% do v2.0) - QUEDA DE 36%!
+- Precision: 25.67% (vs 90.46%) - DESTRUÍDA
+- Recall: 73.97% (vs 63.09%) - Aumentou, mas...
+- ROC-AUC: 73.71% (vs 79.45%)
 
 **O que deu errado:**  
 As features de duração fizeram o modelo ficar "ansioso demais". Ele passou a prever desconto em TUDO, gerando uma avalanche de falsos positivos. A precision caiu de 90% para 26% - inaceitável para um sistema de recomendação.
@@ -364,7 +330,7 @@ Após 3 iterações (v2.0 → v3.0 → v2.1), confirmamos que:
 4. **Casos raros não justificam complexidade** - Stardew Valley (0.3%) não vale reformular tudo
 5. **Validação real é essencial** - Testar em 1.000 jogos revelou que v2.0 já é excelente
 
-**Modelo v2.0 permanece em produção** ✅
+**Modelo v2.0 permanece em produção**
 
 ---
 
@@ -509,12 +475,12 @@ Este projeto foi desenvolvido como Trabalho de Conclusão de Curso em Engenharia
 
 ### Diferenciais técnicos:
 
-✅ **Validação temporal adequada** - Corrigimos data leakage, uma armadilha comum em séries temporais  
-✅ **Pipeline completo** - ETL, feature engineering, treinamento, validação, deploy  
+**Validação temporal adequada** - Corrigimos data leakage, uma armadilha comum em séries temporais  
+**Pipeline completo** - ETL, feature engineering, treinamento, validação, deploy  
 
 
 
-✅ **Testes automatizados completos**
+**Testes automatizados completos**
   - Backend: Cobertura de todos os principais endpoints, cenários de erro, predição em lote, health e stats (pytest)
   - Frontend: Cobertura dos principais componentes (`GameCard`, `GameList`, `GameSearch`, `ModelMetrics`, `PriceAnalysisResult`, `Header`, `App`), incluindo renderização, interações, callbacks, estados de loading/erro (Jest + React Testing Library)
   - Todos os testes passam e cobrem os fluxos essenciais para apresentação de portfólio/TCC
@@ -522,12 +488,12 @@ Este projeto foi desenvolvido como Trabalho de Conclusão de Curso em Engenharia
 
 ### O que o projeto demonstra:
 
-- 🧠 **Machine Learning aplicado** - Não é só teoria, funciona de verdade
-- 🔧 **Engenharia de Software** - Arquitetura limpa, código testável
-- 🧪 **Testes automatizados robustos** - Backend e frontend validados com pytest e Jest/RTL
-- 📊 **Análise de dados** - ETL, feature engineering, validação
-- 🌐 **Desenvolvimento Full-Stack** - Backend + Frontend integrados
-- 📚 **Rigor acadêmico** - Metodologia, documentação, reprodutibilidade
+- **Machine Learning aplicado** - Não é só teoria, funciona de verdade
+- **Engenharia de Software** - Arquitetura limpa, código testável
+- **Testes automatizados robustos** - Backend e frontend validados com pytest e Jest/RTL
+- **Análise de dados** - ETL, feature engineering, validação
+- **Desenvolvimento Full-Stack** - Backend + Frontend integrados
+- **Rigor acadêmico** - Metodologia, documentação, reprodutibilidade
 
 ---
 
