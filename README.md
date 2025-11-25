@@ -62,647 +62,130 @@ flowchart LR
 - `releasedate` (DATE): Data de lançamento
 - `freetoplay` (TINYINT): Se é gratuito (0/1)
 
-**Tabela `price_history`:**
-- `id` (INT, PK, AUTO_INCREMENT): ID único do registro
-- `appid` (INT, FK): Referência ao jogo
-- `date` (DATE): Data do registro de preço
-- `final_price` (DECIMAL): Preço final (após desconto)
-- `initial_price` (DECIMAL): Preço inicial (antes do desconto)
-- `discount` (INT): Percentual de desconto (0-100)
-
-**Relacionamento:** `price_history.appid` → `games.appid` (1:N)
-
----
-
-## Requisitos Funcionais
-
-- Permitir busca e listagem de jogos da Steam
-- Exibir detalhes e histórico de preços de jogos
-- Realizar previsões de desconto utilizando modelo de Machine Learning
-- Fornecer recomendações de compra ou espera
-- Disponibilizar estatísticas gerais do sistema
-- Permitir predição em lote para múltiplos jogos
-- Oferecer endpoints administrativos para setup e importação de dados
-
-## Casos de Uso
-
-- Usuário consulta se um jogo terá desconto nos próximos 30 dias
-- Usuário busca jogos por nome e visualiza histórico de preços
-- Usuário recebe recomendação baseada em análise de dados e modelo ML
-- Administrador inicializa banco de dados e importa datasets
-
----
-
-## Instruções de Deploy
-
-### Backend
-
-**Pré-requisitos:** Python 3.8+, MySQL 8.0+
-
-1. Clone o repositório e acesse `pryzor-back`
-2. Crie e ative ambiente virtual:
-  ```bash
-  python -m venv venv
-  venv\Scripts\activate  # Windows
-  source venv/bin/activate  # Mac/Linux
-  ```
-3. Instale dependências:
-  ```bash
-  pip install -r requirements.txt
-  ```
-4. **Configure o banco de dados:**
-   
-   a) Crie o arquivo `.env` na raiz de `pryzor-back` (use `.env.example` como base):
-   ```env
-   MYSQL_HOST=localhost
-   MYSQL_PORT=3306
-   MYSQL_USER=root
-   MYSQL_PASSWORD=sua_senha
-   MYSQL_DATABASE=steam_pryzor
-   DATABASE_URL=mysql+pymysql://root:sua_senha@localhost:3306/steam_pryzor
-   ```
-   
-   b) Execute o script SQL para criar as tabelas:
-   ```bash
-   mysql -u root -p < setup_database.sql
-   ```
-   
-   c) **(Opcional)** Importe o dataset completo:
-   ```bash
-   python import_dataset.py
-   ```
-   **Nota:** O dataset completo não está no repositório por questões de tamanho. O sistema funciona com qualquer quantidade de dados no banco.
-
-5. Execute a API:
-  ```bash
-  python src/main.py
-  ```
-6. Acesse `http://localhost:8000/docs` para ver a documentação interativa
-
-### Frontend
-
-**Pré-requisitos:** Node.js 16+
-
-1. Acesse `pryzor-front`
-2. Instale dependências:
-  ```bash
-  npm install
-  ```
-3. Execute o servidor de desenvolvimento:
-  ```bash
-  npm start
-  ```
-4. Acesse `http://localhost:3000`
-
-### Deploy em Produção
-
-O projeto utiliza **CI/CD automatizado via GitHub Actions** para deploy contínuo em cada repositório.
-
-**Pipeline configurado:**
-- ✅ Testes automáticos (backend + frontend) em cada push
-- ✅ Geração de relatórios de cobertura
-- ✅ Deploy automático no Render (branch main)
-
-**Arquivos de configuração:**
-- Backend: [pryzor-back/.github/workflows/ci-cd.yml](https://github.com/GustaPeruci/pryzor-back/.github/workflows/ci-cd.yml)
-- Frontend: [pryzor-front/.github/workflows/ci-cd.yml](https://github.com/GustaPeruci/pryzor-front/.github/workflows/ci-cd.yml)
-
-**Fluxo:**
-1. Push para `main` ou `develop` em qualquer repositório
-2. GitHub Actions executa testes automaticamente
-3. Se testes passarem, Render detecta o push e faz deploy
-4. Aplicação atualizada em produção
-
-**Ambientes:**
-- **Frontend:** https://pryzor-front.onrender.com/
-- **Backend:** Deploy automático via Render webhook (integrado ao repositório)
-
----
-
-## Metodologia de Desenvolvimento e Testes
-
-O projeto adota uma **abordagem orientada a testes** para garantir qualidade e confiabilidade:
-
-- **Desenvolvimento incremental:** Features desenvolvidas em ciclos curtos com validação contínua
-- **Testes automatizados:** Cobertura de testes para componentes críticos (backend 33%, frontend 58%)
-- **Validação contínua:** CI/CD executa testes automaticamente em cada push
-- **Refatoração segura:** Testes garantem que mudanças não quebram funcionalidades existentes
-
-Embora não tenha seguido TDD (Test-Driven Development) de forma rigorosa em todas as features, o projeto incorpora **princípios de qualidade e validação contínua**, essenciais para software profissional.
-
-## Cobertura de Testes Automatizados
-
-O projeto possui testes automatizados completos para backend e frontend, com relatórios de cobertura disponíveis.
-
-### Backend
-- Testes com pytest cobrindo todos os principais endpoints, cenários de erro, predição individual e em lote, saúde do sistema e estatísticas.
-- Para executar:
-  ```bash
-  cd pryzor-back
-  pytest tests/ --cov=src --cov-report=html
-  ```
-- **Relatório de cobertura:** [reports/backend/index.html](./reports/backend/index.html)
-
-### Frontend
-- Testes com Jest + React Testing Library cobrindo componentes principais, interações, callbacks, estados de loading/erro.
-- Para executar:
-  ```bash
-  cd pryzor-front
-  npm test -- --coverage
-  ```
-- **Relatório de cobertura:** [reports/frontend/index.html](./reports/frontend/index.html)
-
-**Status:** ✅ Todos os testes passam e cobrem os fluxos essenciais para apresentação de portfólio/TCC.
-
----
-
-
-
-## Ética e Privacidade
-
-O projeto Pryzor respeita a privacidade dos dados e está em conformidade com a LGPD.
-
-**Princípios adotados:**
-- Não utiliza dados sensíveis ou pessoais
-- Todos os dados são públicos ou sintéticos
-- Não há práticas discriminatórias ou violação ética
-- Documentação e código seguem boas práticas de transparência
-
-**Observação:**
-- Caso o projeto evolua para produção, recomenda-se revisão contínua das políticas de privacidade e conformidade legal.
-
----
-
-## Fluxos de Negócio
-
-- Consulta de jogos e histórico de preços
-- Previsão de desconto e recomendação
-- Setup e importação de dados
-
----
-
-## Links Úteis
-
-- Repositório principal: [GitHub](https://github.com/GustaPeruci/Pryzor)
-- Frontend: [https://github.com/GustaPeruci/pryzor-front](https://github.com/GustaPeruci/pryzor-front)
-- Backend: [https://github.com/GustaPeruci/pryzor-back](https://github.com/GustaPeruci/pryzor-back)
-- Deploy de produção: [https://pryzor-front.onrender.com/](https://pryzor-front.onrender.com/)
-- Documentação interativa: http://localhost:8000/docs
-- Vídeo pitch: [Apresentação Pryzor](./Apresentação%20pitch%20Pryzor.mp4)
-
----
-
----
-
-## 📊 O Modelo de Machine Learning
-
-### O que ele faz?
-
-Prevê se um jogo vai ter desconto **maior que 20%** nos próximos 30 dias.
-
-### Resultados do Treinamento (Out/2025)
-
-**Dataset:** 725.268 registros (Steam 2019-2020)
-**Split temporal:** Treino até 2020-04-01, Teste após
-
-**Métricas no Teste (194.017 registros):**
-- Accuracy: 77.93%
-- Precision: 90.26%
-- Recall: 60.55%
-- F1-Score: 72.48%
-- ROC-AUC: 81.83%
-
-**Matriz de Confusão (Teste):**
-|        | Prevê NÃO | Prevê SIM |
-|--------|-----------|-----------|
-| Real NÃO | 94.808    | 6.086     |
-| Real SIM | 36.736    | 56.387    |
-
-**Principais Features:**
-- discount_percent, month, quarter, final_price, is_summer_sale, is_winter_sale, day_of_week, is_weekend
-
-**Recomendação:** Modelo v2.0 é robusto, confiável e pronto para produção. Foco em ML validado para TCC.
-
-### Como foi treinado?
-
-Usamos dados reais da Steam (2019-2020) com **validação temporal** - isso significa que o modelo aprendeu com dados do passado e foi testado com dados do futuro, sem "colar" no tempo (evitando data leakage).
-
-**Split Temporal:**
-- **Treino:** Todos os registros até 01/04/2020 (531.251 registros)
-- **Teste:** Todos os registros após 01/04/2020 (194.017 registros)
-- **Proporção:** ~73% treino / 27% teste
-
-Este tipo de validação é crucial para séries temporais, pois simula o cenário real: treinar com dados históricos e prever o futuro.
-
-### Pipeline de Machine Learning
-
-O desenvolvimento do modelo seguiu as seguintes etapas:
-
-```
-1. Extração de Dados
-   ├─ Coleta de histórico de preços da Steam (2019-2020)
-   ├─ Informações de 2.000+ jogos
-   └─ 725.268 registros de preços
-
-2. Pré-processamento
-   ├─ Limpeza de valores nulos
-   ├─ Conversão de datas
-   ├─ Criação do target binário (will_have_discount)
-   │  └─ Para cada registro: verifica se há desconto ≥20% nos próximos 30 dias
-   └─ Feature Engineering (8 features)
-
-3. Feature Engineering
-   ├─ Temporais (sazonalidade)
-   │  ├─ month: Mês do ano (1-12)
-   │  ├─ quarter: Trimestre (1-4)
-   │  ├─ day_of_week: Dia da semana (0-6)
-   │  ├─ is_weekend: Se é fim de semana (0/1)
-   │  ├─ is_summer_sale: Se está em Summer Sale (0/1)
-   │  └─ is_winter_sale: Se está em Winter Sale (0/1)
-   └─ Preço/Desconto atual
-      ├─ final_price: Preço atual do jogo
-      └─ discount_percent: Desconto atual (0-100)
-
-4. Treinamento
-   ├─ Algoritmo: Random Forest Classifier
-   ├─ Hiperparâmetros:
-   │  ├─ n_estimators: 200 árvores
-   │  ├─ max_depth: 15
-   │  ├─ min_samples_split: 20
-   │  ├─ min_samples_leaf: 10
-   │  └─ class_weight: balanced (para lidar com desbalanceamento)
-   └─ Validação temporal (split 2020-04-01)
-
-5. Validação e Métricas
-   ├─ Confusion Matrix
-   ├─ Precision, Recall, F1-Score
-   ├─ ROC-AUC
-   └─ Validação em 1.000 jogos reais (92.4% de acurácia)
-
-6. Deploy
-   ├─ Modelo salvo como .pkl
-   ├─ Integrado à API FastAPI
-   └─ Disponível via endpoint /api/ml/predict/{appid}
+# Pryzor - Previsão de Descontos na Steam
+
+> **TCC - Engenharia de Software**  
+> Sistema inteligente que recomenda se vale esperar uma promoção
+
+## 1. Visão Geral
+O Pryzor analisa histórico de preços da Steam e prevê se um jogo terá desconto ≥20% nos próximos 30 dias. Resultado: recomendação objetiva (comprar agora ou esperar). Foco em alta precisão para evitar falsos alarmes e aumentar confiança do usuário.
+
+## 2. Arquitetura
+Arquitetura client-server: frontend (React + TypeScript) e backend (FastAPI + Python + MySQL + modelo Random Forest). Modelo carregado lazy na API.
+
+```mermaid
+flowchart LR
+  U[Usuário] --> FE[Frontend]
+  FE --> BE[Backend]
+  BE --> DB[(MySQL)]
+  BE --> ML[Modelo ML]
+  ML --> DB
 ```
 
-### Quais features ele usa?
+Banco (simplificado): `games(appid PK, name, releasedate, freetoplay)` e `price_history(id PK, appid FK, date, final_price, initial_price, discount)`.
 
-O modelo analisa **8 features** cuidadosamente selecionadas:
+## 3. Funcionalidades & Casos de Uso
+- Busca e listagem de jogos
+- Histórico de preços e estado atual
+- Previsão individual e em lote (≥20% em 30 dias)
+- Recomendação de compra ou espera
+- Estatísticas gerais do sistema
+- Setup/importação inicial de dados
 
-| Feature | Tipo | Descrição | Importância |
-|---------|------|-----------|-------------|
-| `month` | Temporal | Mês do ano (1-12) | Alta - captura sazonalidade |
-| `quarter` | Temporal | Trimestre (1-4) | Alta - períodos de promoção |
-| `final_price` | Preço | Preço atual em USD | Média - influencia decisão |
-| `discount_percent` | Desconto | Desconto atual (0-100) | Alta - padrão de desconto |
-| `is_summer_sale` | Temporal | Summer Sale Steam (0/1) | Alta - evento de promoção |
-| `is_winter_sale` | Temporal | Winter Sale Steam (0/1) | Alta - evento de promoção |
-| `day_of_week` | Temporal | Dia da semana (0-6) | Baixa - padrão semanal |
-| `is_weekend` | Temporal | Final de semana (0/1) | Baixa - padrão semanal |
-
-**Por que essas features?**
-- **Evitam data leakage:** Não usamos médias históricas ou features derivadas do target
-- **Capturam sazonalidade:** Steam tem padrões claros de promoção (Summer/Winter Sale)
-- **São disponíveis em produção:** Todas podem ser calculadas no momento da predição
-- **Balanceiam complexidade e performance:** 8 features são suficientes para 74% de F1-Score
-
-### Quão bom ele é?
-
-| Métrica | Valor | O que significa? |
-|---------|-------|------------------|
-| **Precision** | 90.46% | Proporção de previsões positivas que realmente são verdadeiras. Mede o quão confiável é o alerta de desconto: de cada 10 vezes que o modelo prevê desconto, 9 estão corretas. Alta precision significa poucos falsos alarmes. |
-| **F1-Score** | 74.34% | Média harmônica entre precision e recall. Resume o equilíbrio entre acertar e cobrir os casos positivos. Um F1 alto indica que o modelo é bom tanto em acertar quanto em não deixar passar oportunidades. |
-| **Recall** | 63.09% | Proporção dos descontos reais que o modelo conseguiu identificar. Mede a capacidade de encontrar oportunidades: de todos os descontos que realmente aconteceram, o modelo capturou 63%. |
-| **ROC-AUC** | 79.45% | Área sob a curva ROC. Mede a capacidade do modelo de distinguir entre jogos que terão ou não desconto, independentemente do limiar de decisão. Quanto mais próximo de 100%, melhor o poder de separação entre as classes. |
-
-**Validação em casos reais:** Testamos o modelo em **1.000 jogos reais** e obtivemos:
-- **92.4% de acurácia geral**
-- **97.7% de acerto** quando prevê "não terá desconto"
-- **Zero casos** de "aguardar" quando o preço aumentou (Stardew Valley confirmado como caso isolado)
-
-**Por que a Precision é tão alta?**  
-Porque priorizamos **confiabilidade**. É melhor ser conservador e correto do que prometer um desconto que não vai acontecer. Quando o Pryzor diz "espera aí que vai ter promoção", você pode confiar.
-
-**E o Recall moderado (63%)?**  
-É o trade-off. Pegamos 63% das oportunidades de desconto, mas com 90% de certeza de que não é falso alarme. Para um sistema de recomendação, isso faz sentido.
-
----
-
-## 🔬 Histórico de Evolução do Modelo
-
-### Modelo v2.0 (ATUAL - EM PRODUÇÃO)
-**Data:** Outubro 2025  
-**Status:** Estável e validado
-
-**Características:**
-- 8 features (temporais + contextuais)
-- Random Forest (200 estimadores, depth=15)
-- Validação temporal (split 2020-04-01)
-- Target binário: desconto >= 20% em 30 dias
-
-**Métricas (Teste):**
-- Precision: 90.46%
-- F1-Score: 74.34%
-- Recall: 63.09%
-- ROC-AUC: 79.45%
-
-**Validação Real (1.000 jogos):**
-- Acurácia: 92.4%
-- Acerto "Sem desconto": 97.7%
-- Zero casos tipo Stardew Valley
-
-**Por que funciona:**  
-Modelo conservador e confiável. Prefere não prever desconto quando há dúvida, o que resulta em alta precision e confiança do usuário.
-
-### Por que Random Forest?
-
-A escolha do **Random Forest Classifier** foi baseada em testes comparativos com outros algoritmos:
-
-| Algoritmo | F1-Score | Precision | Recall | ROC-AUC | Tempo Treino |
-|-----------|----------|-----------|--------|---------|--------------|
-| **Random Forest** | **74.34%** | **90.46%** | 63.09% | **79.45%** | ~60s |
-| Logistic Regression | 52.18% | 68.12% | 42.55% | 71.23% | ~5s |
-| Decision Tree | 65.43% | 72.34% | 59.87% | 68.90% | ~8s |
-| XGBoost | 71.89% | 85.23% | 62.11% | 77.12% | ~120s |
-| Neural Network (MLP) | 58.76% | 70.45% | 50.32% | 69.87% | ~180s |
-
-**Vantagens do Random Forest:**
-1. **Melhor F1-Score e Precision** - Essenciais para sistema de recomendação
-2. **Robusto a overfitting** - Ensemble de árvores reduz variância
-3. **Não requer feature scaling** - Trabalha bem com features de diferentes escalas
-4. **Interpretável** - Podemos analisar importância de features
-5. **Tempo de treino razoável** - Não tão lento quanto Neural Networks
-6. **Funciona bem com dados desbalanceados** - Com `class_weight='balanced'`
-
-**Por que não XGBoost?**
-Apesar do XGBoost ter bom desempenho (71.89% F1), o Random Forest teve **melhor Precision (90.46% vs 85.23%)**, o que é crucial para evitar falsos alarmes. Além disso, treina 2x mais rápido.
-
----
-
-### Modelo v3.0 (DESCARTADO)
-**Data:** Outubro 2025  
-**Status:** Rejeitado - Performance inferior ao v2.0
-
-**O que tentamos:**
-- Target multi-classe (4 categorias: price_increase, stable, small_discount, large_discount)
-- Objetivo: Distinguir aumentos de preço vs estabilidade
-- Motivação: Resolver caso Stardew Valley
-
-**Resultado:**
-- F1-Score: ~45% (vs 74% do v2.0)
-- Precision caiu drasticamente
-- Complexidade adicional sem ganho prático
-- ROC-AUC: 74.2% (vs 79.45% do v2.0)
-
-**Lição aprendida:**  
-Multi-classe não funciona bem com dados desbalanceados. O caso Stardew Valley (preço aumentou após promoção) é EXTREMAMENTE RARO (0.3% dos casos). Não vale adicionar complexidade para resolver 3 casos em 1000.
-
-**Decisão:** Reverter para v2.0. A abordagem binária simples funciona melhor.
-
----
-
-### Modelo v2.1 (DESCARTADO)
-**Data:** Outubro 2025  
-**Status:** Rejeitado - Piora significativa
-
-**O que tentamos:**
-- Adicionar 3 features de duração de promoção:
-  - `discount_consecutive_days`: Dias em promoção
-  - `discount_progress_ratio`: Progresso da promoção
-  - `discount_likely_ending`: Booleano se está terminando
-- Objetivo: Melhorar detecção de descontos contínuos
-- Motivação: 53 de 76 erros eram em jogos com desconto ativo
-
-**Resultado:**
-- **F1-Score: 38.11%** (vs 74.34% do v2.0) - QUEDA DE 36%!
-- Precision: 25.67% (vs 90.46%) - DESTRUÍDA
-- Recall: 73.97% (vs 63.09%) - Aumentou, mas...
-- ROC-AUC: 73.71% (vs 79.45%)
-
-**O que deu errado:**  
-As features de duração fizeram o modelo ficar "ansioso demais". Ele passou a prever desconto em TUDO, gerando uma avalanche de falsos positivos. A precision caiu de 90% para 26% - inaceitável para um sistema de recomendação.
-
-**Análise de importância:**
-- `discount_consecutive_days` ficou em 3º lugar (10.55% de importância)
-- Mas causou desbalanceamento severo
-- Modelo aprendeu: "tem desconto há X dias → vai continuar sempre"
-
-**Lição aprendida:**  
-Features de duração são úteis em TEORIA, mas na PRÁTICA causam overfitting em padrões específicos. O modelo v2.0 simples generaliza melhor.
-
-**Decisão:** Reverter para v2.0. Simplicidade vence complexidade.
-
----
-
-## 💡 Conclusão do Processo Iterativo
-
-Após 3 iterações (v2.0 → v3.0 → v2.1), confirmamos que:
-
-1. **Simplicidade funciona** - 8 features bem escolhidas > 11 features complexas
-2. **Binário > Multi-classe** - Para dados desbalanceados, menos é mais
-3. **Precision > Recall** - Em sistemas de recomendação, confiabilidade é rei
-4. **Casos raros não justificam complexidade** - Stardew Valley (0.3%) não vale reformular tudo
-5. **Validação real é essencial** - Testar em 1.000 jogos revelou que v2.0 já é excelente
-
-**Modelo v2.0 permanece em produção**
-
----
-
-## 🎯 Próximos Passos (Futuro)
-
-Se quisermos melhorar o v2.0 no futuro, as abordagens promissoras são:
-
-1. **Regras de negócio híbridas** - v2.0 + regra simples pós-predição
-2. **Mais dados temporais** - Expandir dataset 2020-2023
-3. **Features de frequência** - Quantas vezes o jogo entra em promoção por ano
-4. **Ensemble conservador** - Combinar v2.0 com modelo secundário (só para confirmar)
-
-Mas por enquanto, **v2.0 está excelente e estável**.
-
----
-
-## 🚀 Como Rodar o Projeto
-
-### Opção 1: Rodar só o backend (API + ML)
-
+## 4. Quick Start
+Backend:
 ```bash
-# 1. Entre na pasta do backend
 cd pryzor-back
-
-# 2. Crie um ambiente virtual
 python -m venv venv
 venv\Scripts\activate  # Windows
-source venv/bin/activate  # Mac/Linux
-
-# 3. Instale as dependências
 pip install -r requirements.txt
-
-# 4. Configure o banco de dados (crie um .env)
-# Copie o .env.example e preencha com seus dados MySQL
-
-# 5. Rode a API
+# criar .env (base em .env.example)
 python src/main.py
 ```
+Docs: http://localhost:8000/docs
 
-Acesse: `http://localhost:8000/docs` para ver a documentação interativa.
-
-### Opção 2: Rodar o projeto completo (Backend + Frontend)
-
+Frontend:
 ```bash
-# Terminal 1: Backend
-cd pryzor-back
-python src/main.py
-
-# Terminal 2: Frontend
 cd pryzor-front
 npm install
 npm run dev
 ```
+Interface: http://localhost:5173
 
-Acesse: `http://localhost:5173` para usar a interface.
+## 5. Principais Endpoints
+Sistema: `GET /health`, `GET /api/stats`
+Jogos: `GET /api/games`, `GET /api/games/{appid}`, filtro `?search=`
+ML: `GET /api/ml/info`, `GET /api/ml/predict/{appid}`, `POST /api/ml/predict/batch`
 
----
-
-## 📡 Endpoints Principais da API
-
-### Sistema
-- `GET /health` - Verifica se tudo está funcionando
-- `GET /api/stats` - Estatísticas gerais (quantos jogos, registros, etc)
-
-### Jogos
-- `GET /api/games` - Lista jogos (com filtros e paginação)
-- `GET /api/games/{appid}` - Detalhes de um jogo específico
-- `GET /api/games?search=Counter` - Busca jogos por nome
-
-### Machine Learning
-- `GET /api/ml/info` - Informações sobre o modelo (versão, métricas)
-- `GET /api/ml/predict/730` - Faz previsão para um jogo (ex: CS:GO)
-- `POST /api/ml/predict/batch` - Previsão em lote (até 50 jogos)
-
-**Exemplo de resposta:**
+Exemplo:
 ```json
 {
   "appid": 271590,
-  "game_name": "Grand Theft Auto V",
   "will_have_discount": true,
   "probability": 0.78,
-  "confidence": 0.56,
-  "recommendation": "AGUARDAR - Alta probabilidade de desconto melhor em breve",
+  "recommendation": "AGUARDAR",
   "current_price": 119.90
 }
 ```
 
----
+## 6. Modelo de ML (Resumo)
+Objetivo: prever se haverá desconto ≥20% em 30 dias. 
+Features (8): month, quarter, final_price, discount_percent, is_summer_sale, is_winter_sale, day_of_week, is_weekend.
+Validação temporal (cut 2020-04-01). Métricas (teste): Precision 90.46%, F1 74.34%, Recall 63.09%, ROC-AUC 79.45%. Alta precision → poucas recomendações erradas de “esperar”. Random Forest escolhido por melhor equilíbrio entre desempenho, interpretabilidade e tempo de treino.
 
-## 🛠️ Tecnologias Usadas
+Mais detalhes (pipeline completo, histórico de versões v2.0 / v3.0 / v2.1, comparação de algoritmos, lições aprendidas): ver `docs/model_evolution.md`.
 
-### Backend
-- **Python 3.11** - Linguagem principal
-- **FastAPI** - Framework web (rápido e moderno)
-- **scikit-learn** - Machine Learning
-- **pandas** - Manipulação de dados
-- **MySQL** - Banco de dados (2.000 jogos, 725k registros)
+## 7. Desenvolvimento & Testes
+Abordagem incremental orientada a testes. Cobertura crítica (backend ~33%, frontend ~58%) garantindo refatoração segura.
+Backend:
+```bash
+cd pryzor-back
+pytest --cov=src
+```
+Frontend:
+```bash
+cd pryzor-front
+npm test -- --coverage
+```
+Relatórios locais em `reports/`. CI executa testes em cada push. Não foi TDD estrito em todas as features, mas princípios de validação contínua foram seguidos.
 
-### Frontend
-- **React 19** - Framework de interface
-- **TypeScript** - JavaScript com tipos
-- **Vite** - Build tool (super rápido)
-- **Axios** - Cliente HTTP
+## 8. CI/CD & Deploy
+GitHub Actions: testes + cobertura + deploy automático (Render) na branch `main` para cada repositório (backend e frontend). Ao passar nos testes, serviço é atualizado sem intervenção manual.
 
-### Machine Learning
-- **Random Forest** - Algoritmo de classificação
-- **Validação Temporal** - Split antes/depois de 2020-04-01
-- **8 Features** - Temporais e contextuais (sem data leakage)
-
----
-
-## 📁 Estrutura do Repositório
-
+## 9. Estrutura do Repositório
 ```
 pryzor/
-├── pryzor-back/              # Backend (API + ML)
-│   ├── src/
-│   │   ├── main.py           # API FastAPI (11 endpoints)
-│   │   ├── api/              # Serviços (ML, schemas)
-│   │   └── database/         # Conexão MySQL
-│   ├── scripts/              # Scripts de treinamento
-│   ├── ml_model/             # Modelo treinado (.pkl)
-│   ├── tests/                # Testes automatizados
-│   └── docs/                 # Documentação técnica
-│
-├── pryzor-front/             # Frontend (React)
-│   ├── src/
-│   │   ├── components/       # Componentes React
-│   │   └── services/         # Cliente API
-│   └── public/
-│
-├── CONTEXT.md                # Contexto completo do projeto
-├── COPILOT_PROMPT.md         # Prompt para continuar desenvolvimento
-└── README.md                 # Este arquivo
+├── pryzor-back/       # API + ML
+│   ├── src/           # Código da API
+│   ├── scripts/       # Treino / utilidades
+│   ├── ml_model/      # Modelo (.pkl)
+│   ├── tests/         # Testes pytest
+│   └── docs/          # Doc técnica específica
+├── pryzor-front/      # Interface React
+│   └── src/           # Componentes e serviços
+├── docs/              # Documentação aprofundada (ML evolução)
+├── CONTEXT.md
+├── COPILOT_PROMPT.md
+└── README.md
 ```
 
----
+## 10. Contexto Acadêmico
+Projeto de TCC demonstrando aplicação real de ML com validação temporal correta, engenharia de software limpa, testes automatizados e documentação reprodutível. Ênfase em confiabilidade de recomendação (precision alta) e transparência metodológica.
 
-## 🎓 Contexto Acadêmico (TCC)
+## 11. Licença & Ética
+Uso acadêmico. Dados públicos/sintéticos, sem informações pessoais. Conformidade com princípios de privacidade (LGPD). Evolução futura: revisão contínua de políticas.
 
-Este projeto foi desenvolvido como Trabalho de Conclusão de Curso em Engenharia de Software.
+## 12. Autor
+Gustavo Peruci — GitHub: https://github.com/GustaPeruci  
+TCC Engenharia de Software - 2025
 
-### Diferenciais técnicos:
-
-**Validação temporal adequada** - Corrigimos data leakage, uma armadilha comum em séries temporais  
-**Pipeline completo** - ETL, feature engineering, treinamento, validação, deploy  
-
-
-
-**Testes automatizados completos**
-  - Backend: Cobertura de todos os principais endpoints, cenários de erro, predição em lote, health e stats (pytest)
-  - Frontend: Cobertura dos principais componentes (`GameCard`, `GameList`, `GameSearch`, `ModelMetrics`, `PriceAnalysisResult`, `Header`, `App`), incluindo renderização, interações, callbacks, estados de loading/erro (Jest + React Testing Library)
-  - Todos os testes passam e cobrem os fluxos essenciais para apresentação de portfólio/TCC
-
-
-### O que o projeto demonstra:
-
-- **Machine Learning aplicado** - Não é só teoria, funciona de verdade
-- **Engenharia de Software** - Arquitetura limpa, código testável
-- **Testes automatizados robustos** - Backend e frontend validados com pytest e Jest/RTL
-- **Análise de dados** - ETL, feature engineering, validação
-- **Desenvolvimento Full-Stack** - Backend + Frontend integrados
-- **Rigor acadêmico** - Metodologia, documentação, reprodutibilidade
+## 13. Links Úteis
+- Repositório principal: https://github.com/GustaPeruci/Pryzor
+- Frontend: https://github.com/GustaPeruci/pryzor-front
+- Backend: https://github.com/GustaPeruci/pryzor-back
+- Deploy (frontend): https://pryzor-front.onrender.com/
+- API Docs: http://localhost:8000/docs
+- Vídeo pitch: ./Apresentação%20pitch%20Pryzor.mp4
 
 ---
-
-## 📝 Licença
-
-Este projeto é acadêmico e foi desenvolvido para fins de aprendizado.
-
----
-
-## � Autor
-
-**Gustavo Peruci**  
-📧 [Seu email]  
-🔗 [GitHub](https://github.com/GustaPeruci)  
-🎓 TCC - Engenharia de Software - 2025
-
----
-
-## 🧪 Testes Automatizados
-
-### Backend
-- Execute todos os testes com:
-  ```bash
-  pytest pryzor-back/tests/test_api.py
-  ```
-- Cobertura: endpoints, erros, batch, health, stats
-
-### Frontend
-- Execute todos os testes com:
-  ```bash
-  cd pryzor-front
-  npm test
-  ```
-- Cobertura: componentes principais, renderização, interações, callbacks, estados de loading/erro
-
-Todos os testes passam e cobrem os fluxos essenciais para apresentação de portfólio/TCC.
-
-**💡 Dica:** Para mais detalhes técnicos sobre o backend ou frontend, veja os READMEs específicos em `pryzor-back/README.md` e `pryzor-front/README.md`.
+Para histórico detalhado do modelo e experimentos rejeitados acesse `docs/model_evolution.md`.
