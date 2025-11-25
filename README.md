@@ -45,12 +45,12 @@ O Pryzor segue arquitetura client-server, separando frontend (React + TypeScript
 ### Diagrama C4 (nível de containers)
 
 ```mermaid
-flowchart TD
-  Usuario[Usuário] --> Frontend[Frontend React]
-  Frontend --> Backend[Backend FastAPI]
-  Backend --> MySQL[(MySQL Database)]
-  Backend --> ML[Modelo ML Random Forest]
-  ML --> MySQL
+flowchart LR
+  U[Usuário] --> FE[Frontend]
+  FE --> BE[Backend]
+  BE --> DB[(MySQL)]
+  BE --> ML[Modelo ML]
+  ML --> DB
 ```
 
 ### Schema do Banco de Dados
@@ -155,11 +155,40 @@ flowchart TD
 4. Acesse `http://localhost:3000`
 
 ### Deploy em Produção
-- Recomenda-se uso de Docker e integração com CI/CD (GitHub Actions)
-- Configurar variáveis de ambiente e banco de dados seguro
-- Documentar endpoints públicos e credenciais de acesso restrito
+
+O projeto utiliza **CI/CD automatizado via GitHub Actions** para deploy contínuo em cada repositório.
+
+**Pipeline configurado:**
+- ✅ Testes automáticos (backend + frontend) em cada push
+- ✅ Geração de relatórios de cobertura
+- ✅ Deploy automático no Render (branch main)
+
+**Arquivos de configuração:**
+- Backend: [pryzor-back/.github/workflows/ci-cd.yml](https://github.com/GustaPeruci/pryzor-back/.github/workflows/ci-cd.yml)
+- Frontend: [pryzor-front/.github/workflows/ci-cd.yml](https://github.com/GustaPeruci/pryzor-front/.github/workflows/ci-cd.yml)
+
+**Fluxo:**
+1. Push para `main` ou `develop` em qualquer repositório
+2. GitHub Actions executa testes automaticamente
+3. Se testes passarem, Render detecta o push e faz deploy
+4. Aplicação atualizada em produção
+
+**Ambientes:**
+- **Frontend:** https://pryzor-front.onrender.com/
+- **Backend:** Deploy automático via Render webhook (integrado ao repositório)
 
 ---
+
+## Metodologia de Desenvolvimento e Testes
+
+O projeto adota uma **abordagem orientada a testes** para garantir qualidade e confiabilidade:
+
+- **Desenvolvimento incremental:** Features desenvolvidas em ciclos curtos com validação contínua
+- **Testes automatizados:** Cobertura de testes para componentes críticos (backend 33%, frontend 58%)
+- **Validação contínua:** CI/CD executa testes automaticamente em cada push
+- **Refatoração segura:** Testes garantem que mudanças não quebram funcionalidades existentes
+
+Embora não tenha seguido TDD (Test-Driven Development) de forma rigorosa em todas as features, o projeto incorpora **princípios de qualidade e validação contínua**, essenciais para software profissional.
 
 ## Cobertura de Testes Automatizados
 
