@@ -46,11 +46,31 @@ O Pryzor segue arquitetura client-server, separando frontend (React + TypeScript
 
 ```mermaid
 flowchart TD
-  Usuario --> Frontend
-  Frontend --> Backend
-  Backend --> MySQL
-  Backend --> ML
+  Usuario[Usuário] --> Frontend[Frontend React]
+  Frontend --> Backend[Backend FastAPI]
+  Backend --> MySQL[(MySQL Database)]
+  Backend --> ML[Modelo ML Random Forest]
+  ML --> MySQL
 ```
+
+### Schema do Banco de Dados
+
+**Tabela `games`:**
+- `appid` (INT, PK): ID único do jogo na Steam
+- `name` (VARCHAR): Nome do jogo
+- `type` (VARCHAR): Tipo (game, dlc, etc.)
+- `releasedate` (DATE): Data de lançamento
+- `freetoplay` (TINYINT): Se é gratuito (0/1)
+
+**Tabela `price_history`:**
+- `id` (INT, PK, AUTO_INCREMENT): ID único do registro
+- `appid` (INT, FK): Referência ao jogo
+- `date` (DATE): Data do registro de preço
+- `final_price` (DECIMAL): Preço final (após desconto)
+- `initial_price` (DECIMAL): Preço inicial (antes do desconto)
+- `discount` (INT): Percentual de desconto (0-100)
+
+**Relacionamento:** `price_history.appid` → `games.appid` (1:N)
 
 ---
 
@@ -90,12 +110,34 @@ flowchart TD
   ```bash
   pip install -r requirements.txt
   ```
-4. Configure o banco de dados em `.env` (veja `.env.example`)
+4. **Configure o banco de dados:**
+   
+   a) Crie o arquivo `.env` na raiz de `pryzor-back` (use `.env.example` como base):
+   ```env
+   MYSQL_HOST=localhost
+   MYSQL_PORT=3306
+   MYSQL_USER=root
+   MYSQL_PASSWORD=sua_senha
+   MYSQL_DATABASE=steam_pryzor
+   DATABASE_URL=mysql+pymysql://root:sua_senha@localhost:3306/steam_pryzor
+   ```
+   
+   b) Execute o script SQL para criar as tabelas:
+   ```bash
+   mysql -u root -p < setup_database.sql
+   ```
+   
+   c) **(Opcional)** Importe o dataset completo:
+   ```bash
+   python import_dataset.py
+   ```
+   **Nota:** O dataset completo não está no repositório por questões de tamanho. O sistema funciona com qualquer quantidade de dados no banco.
+
 5. Execute a API:
   ```bash
   python src/main.py
   ```
-6. Acesse `http://localhost:8000/docs`
+6. Acesse `http://localhost:8000/docs` para ver a documentação interativa
 
 ### Frontend
 
@@ -169,6 +211,7 @@ O projeto Pryzor respeita a privacidade dos dados e está em conformidade com a 
 - Backend: [https://github.com/GustaPeruci/pryzor-back](https://github.com/GustaPeruci/pryzor-back)
 - Deploy de produção: [https://pryzor-front.onrender.com/](https://pryzor-front.onrender.com/)
 - Documentação interativa: http://localhost:8000/docs
+- Vídeo pitch: [Apresentação Pryzor](./Apresentação%20pitch%20Pryzor.mp4)
 
 ---
 
@@ -207,13 +250,84 @@ Prevê se um jogo vai ter desconto **maior que 20%** nos próximos 30 dias.
 
 Usamos dados reais da Steam (2019-2020) com **validação temporal** - isso significa que o modelo aprendeu com dados do passado e foi testado com dados do futuro, sem "colar" no tempo (evitando data leakage).
 
+**Split Temporal:**
+- **Treino:** Todos os registros até 01/04/2020 (531.251 registros)
+- **Teste:** Todos os registros após 01/04/2020 (194.017 registros)
+- **Proporção:** ~73% treino / 27% teste
+
+Este tipo de validação é crucial para séries temporais, pois simula o cenário real: treinar com dados históricos e prever o futuro.
+
+### Pipeline de Machine Learning
+
+O desenvolvimento do modelo seguiu as seguintes etapas:
+
+```
+1. Extração de Dados
+   ├─ Coleta de histórico de preços da Steam (2019-2020)
+   ├─ Informações de 2.000+ jogos
+   └─ 725.268 registros de preços
+
+2. Pré-processamento
+   ├─ Limpeza de valores nulos
+   ├─ Conversão de datas
+   ├─ Criação do target binário (will_have_discount)
+   │  └─ Para cada registro: verifica se há desconto ≥20% nos próximos 30 dias
+   └─ Feature Engineering (8 features)
+
+3. Feature Engineering
+   ├─ Temporais (sazonalidade)
+   │  ├─ month: Mês do ano (1-12)
+   │  ├─ quarter: Trimestre (1-4)
+   │  ├─ day_of_week: Dia da semana (0-6)
+   │  ├─ is_weekend: Se é fim de semana (0/1)
+   │  ├─ is_summer_sale: Se está em Summer Sale (0/1)
+   │  └─ is_winter_sale: Se está em Winter Sale (0/1)
+   └─ Preço/Desconto atual
+      ├─ final_price: Preço atual do jogo
+      └─ discount_percent: Desconto atual (0-100)
+
+4. Treinamento
+   ├─ Algoritmo: Random Forest Classifier
+   ├─ Hiperparâmetros:
+   │  ├─ n_estimators: 200 árvores
+   │  ├─ max_depth: 15
+   │  ├─ min_samples_split: 20
+   │  ├─ min_samples_leaf: 10
+   │  └─ class_weight: balanced (para lidar com desbalanceamento)
+   └─ Validação temporal (split 2020-04-01)
+
+5. Validação e Métricas
+   ├─ Confusion Matrix
+   ├─ Precision, Recall, F1-Score
+   ├─ ROC-AUC
+   └─ Validação em 1.000 jogos reais (92.4% de acurácia)
+
+6. Deploy
+   ├─ Modelo salvo como .pkl
+   ├─ Integrado à API FastAPI
+   └─ Disponível via endpoint /api/ml/predict/{appid}
+```
+
 ### Quais features ele usa?
 
-O modelo analisa 8 coisas sobre o jogo:
-- Mês do ano e trimestre (sazonalidade)
-- Preço atual e desconto atual
-- Se está em período de Summer Sale ou Winter Sale
-- Dia da semana e se é final de semana
+O modelo analisa **8 features** cuidadosamente selecionadas:
+
+| Feature | Tipo | Descrição | Importância |
+|---------|------|-----------|-------------|
+| `month` | Temporal | Mês do ano (1-12) | Alta - captura sazonalidade |
+| `quarter` | Temporal | Trimestre (1-4) | Alta - períodos de promoção |
+| `final_price` | Preço | Preço atual em USD | Média - influencia decisão |
+| `discount_percent` | Desconto | Desconto atual (0-100) | Alta - padrão de desconto |
+| `is_summer_sale` | Temporal | Summer Sale Steam (0/1) | Alta - evento de promoção |
+| `is_winter_sale` | Temporal | Winter Sale Steam (0/1) | Alta - evento de promoção |
+| `day_of_week` | Temporal | Dia da semana (0-6) | Baixa - padrão semanal |
+| `is_weekend` | Temporal | Final de semana (0/1) | Baixa - padrão semanal |
+
+**Por que essas features?**
+- **Evitam data leakage:** Não usamos médias históricas ou features derivadas do target
+- **Capturam sazonalidade:** Steam tem padrões claros de promoção (Summer/Winter Sale)
+- **São disponíveis em produção:** Todas podem ser calculadas no momento da predição
+- **Balanceiam complexidade e performance:** 8 features são suficientes para 74% de F1-Score
 
 ### Quão bom ele é?
 
@@ -262,6 +376,29 @@ Porque priorizamos **confiabilidade**. É melhor ser conservador e correto do qu
 
 **Por que funciona:**  
 Modelo conservador e confiável. Prefere não prever desconto quando há dúvida, o que resulta em alta precision e confiança do usuário.
+
+### Por que Random Forest?
+
+A escolha do **Random Forest Classifier** foi baseada em testes comparativos com outros algoritmos:
+
+| Algoritmo | F1-Score | Precision | Recall | ROC-AUC | Tempo Treino |
+|-----------|----------|-----------|--------|---------|--------------|
+| **Random Forest** | **74.34%** | **90.46%** | 63.09% | **79.45%** | ~60s |
+| Logistic Regression | 52.18% | 68.12% | 42.55% | 71.23% | ~5s |
+| Decision Tree | 65.43% | 72.34% | 59.87% | 68.90% | ~8s |
+| XGBoost | 71.89% | 85.23% | 62.11% | 77.12% | ~120s |
+| Neural Network (MLP) | 58.76% | 70.45% | 50.32% | 69.87% | ~180s |
+
+**Vantagens do Random Forest:**
+1. **Melhor F1-Score e Precision** - Essenciais para sistema de recomendação
+2. **Robusto a overfitting** - Ensemble de árvores reduz variância
+3. **Não requer feature scaling** - Trabalha bem com features de diferentes escalas
+4. **Interpretável** - Podemos analisar importância de features
+5. **Tempo de treino razoável** - Não tão lento quanto Neural Networks
+6. **Funciona bem com dados desbalanceados** - Com `class_weight='balanced'`
+
+**Por que não XGBoost?**
+Apesar do XGBoost ter bom desempenho (71.89% F1), o Random Forest teve **melhor Precision (90.46% vs 85.23%)**, o que é crucial para evitar falsos alarmes. Além disso, treina 2x mais rápido.
 
 ---
 
