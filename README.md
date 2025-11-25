@@ -163,19 +163,27 @@ flowchart TD
 
 ## Cobertura de Testes Automatizados
 
+O projeto possui testes automatizados completos para backend e frontend, com relatórios de cobertura disponíveis.
+
 ### Backend
 - Testes com pytest cobrindo todos os principais endpoints, cenários de erro, predição individual e em lote, saúde do sistema e estatísticas.
 - Para executar:
   ```bash
-  pytest tests/
+  cd pryzor-back
+  pytest tests/ --cov=src --cov-report=html
   ```
+- **Relatório de cobertura:** [reports/backend/index.html](./reports/backend/index.html)
 
 ### Frontend
 - Testes com Jest + React Testing Library cobrindo componentes principais, interações, callbacks, estados de loading/erro.
 - Para executar:
   ```bash
-  npm test
+  cd pryzor-front
+  npm test -- --coverage
   ```
+- **Relatório de cobertura:** [reports/frontend/index.html](./reports/frontend/index.html)
+
+**Status:** ✅ Todos os testes passam e cobrem os fluxos essenciais para apresentação de portfólio/TCC.
 
 ---
 
