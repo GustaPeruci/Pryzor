@@ -194,7 +194,7 @@ Uso acadêmico. Dados públicos/sintéticos, sem informações pessoais. Conform
 
 ### 🚀 Demonstração
 - [🌐 App em Produção](https://pryzor-front.onrender.com/)
-- [📖 API Docs (local)](http://localhost:8000/docs)
+- [[📖 API Docs (local)](https://pryzor-back.onrender.com/docs)
 - [🎥 Vídeo Pitch](youtube.com/watch?v=Pw0WEkMKU48&feature=youtu.be)
 
 ### 📚 Documentação Adicional
